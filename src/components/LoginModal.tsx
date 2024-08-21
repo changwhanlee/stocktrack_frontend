@@ -91,7 +91,8 @@ export default function LoginModal({isOpen, onClose} : LoginModalProps) {
                   </Box>
                 }
               />
-              <Input 
+              <Input
+              type="password"
               isInvalid={Boolean(errors.password?.message)}
               {...register("password", {
                 required: "Please write a password",

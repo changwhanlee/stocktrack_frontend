@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Box, Card, CardHeader, CardBody, Flex, Heading, Button, Table, Thead, Tbody, Tr, Th, Td, Link } from "@chakra-ui/react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 interface IBankData {
     id: number;
@@ -78,13 +78,10 @@ export default function BankBarGraph({bankResult} : IBankDashboard ) {
         }
       });
     });
-    if (max === 0) {
-      max = -min
-    }
-    max = max + 1000000
-    min = min - 1000000
+    const absMax = Math.max(Math.abs(min), Math.abs(max));
+    
+    return [-absMax, absMax];
 
-    return [min, max]
   }
 
   const [minY, maxY] = findMinMax();
@@ -94,13 +91,20 @@ export default function BankBarGraph({bankResult} : IBankDashboard ) {
       return(
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData}>
-              <XAxis dataKey="period" />
+              <XAxis 
+                dataKey="period"
+                interval={0}
+                tickLine={true}
+                axisLine={true}
+              />
               <YAxis 
                 width={80}
                 tickFormatter={formatYAxis}
                 domain={[minY, maxY]}
+                ticks={[minY, minY / 2, 0, maxY / 2, maxY]}
                 allowDataOverflow={true}
               />
+              <CartesianGrid strokeDasharray="3 3" vertical={true}/>
               <Tooltip />
               <Legend />
               {Object.keys(bankResult).map((bank, index) => (

@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardBody, CardHeader, Checkbox, CheckboxGroup, Container, Flex, FormControl, FormHelperText, FormLabel, Grid, GridItem, HStack, Heading, Input, Select, SimpleGrid, Stack, Stat, StatLabel, StatNumber, Table, Tbody, Td, Th, Thead, Tr, VStack, useToast } from "@chakra-ui/react";
+import { Box, Button, Card, CardBody, CardHeader, Checkbox, CheckboxGroup, Container, Flex, FormControl, FormHelperText, FormLabel, Grid, GridItem, HStack, Heading, Input, Select, SimpleGrid, Stack, Stat, StatLabel, StatNumber, Table, Tbody, Td, Text, Th, Thead, Tr, VStack, useToast } from "@chakra-ui/react";
 import useUser from "../lib/useUser";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { IRegisterStockVariales, createStock, getCategoryBanks, getCategoryName, getTotalAsset, logOut, readCategoryStocks, usernameLogIn } from "../api";
@@ -55,6 +55,8 @@ export default function BankDashBoard() {
     const totalResult = data?.total_result
 
     if (bankResult && totalResult) {
+        console.log('total____________________________________')
+        console.log(totalResult)
         if (Object.entries(bankResult).length === 0) {
             return (
                 <VStack bg="gray.100" minH="100vh">
@@ -88,6 +90,9 @@ export default function BankDashBoard() {
                     return { ...acc, [bank]: bankData ? bankData.total_asset : 0 };
                 }, {})
             }));
+
+            const midIndex = Math.floor((totalResult.findIndex(item => item.date === latestTotal.date) + totalResult.findIndex(item => item.date === initialTotal.date)) / 2);
+            const midTotal = totalResult[midIndex];
             console.log('------------------------------')
             console.log(bankResult)
 
@@ -95,27 +100,40 @@ export default function BankDashBoard() {
                 <Container maxW="container.xl" py={8}>
                     <VStack spacing={8} align="stretch">
                         <Heading size="xl" color="green.600" textAlign="center">예금 상황 대시보드</Heading>
-                        <SimpleGrid columns={{ base :1, md: 2}} spacing={6}>
+                        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
                             <Stat>
                             <Card>
                                 <CardHeader>
-                                <StatLabel>현재 총 예금액</StatLabel>
+                                    <Text fontSize="xl" color="blue.500" fontWeight="bold">{formatDate(latestTotal.date)}</Text>
                                 </CardHeader>
                                 <CardBody>
-                                <StatNumber fontSize="2xl" color="green.500" >{latestTotal.total_asset.toLocaleString()}원</StatNumber>
+                                    <StatNumber fontSize="2xl" color="green.500">
+                                        {latestTotal.total_asset.toLocaleString()}원
+                                    </StatNumber>
                                 </CardBody>
                             </Card>
                             </Stat>
-                            
+                            <Stat>
+                                <Card>
+                                    <CardHeader>
+                                        <Text fontSize="xl" color="blue.500" fontWeight="bold">{formatDate(midTotal.date)}</Text>
+                                    </CardHeader>
+                                    <CardBody>
+                                        <StatNumber fontSize="2xl" color="green.500">
+                                            {midTotal.total_asset.toLocaleString()}원
+                                        </StatNumber>
+                                    </CardBody>
+                                </Card>
+                            </Stat>
                             <Stat>
                             <Card>
                                 <CardHeader>
-                                <StatLabel>총 수익률</StatLabel>
+                                    <Text fontSize="xl" color="blue.500" fontWeight="bold">{formatDate(initialTotal.date)} (처음 날짜)</Text>
                                 </CardHeader>
                                 <CardBody>
-                                <StatNumber fontSize="2xl" color={parseFloat(totalProfitRate) >= 0 ? "green.500" : "red.500"}>
-                                    {totalProfitRate}%
-                                </StatNumber>
+                                    <StatNumber fontSize="2xl" color="green.500">
+                                        {initialTotal.total_asset.toLocaleString()}원
+                                    </StatNumber>
                                 </CardBody>
                             </Card>
                             </Stat>

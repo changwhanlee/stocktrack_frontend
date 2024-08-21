@@ -133,72 +133,80 @@ export default function CategoryStockState({data} : IcategoryStockState) {
         const annualReturns = calculateAnnualReturn(dataByYear)
         return(
             <Box>
-                <SimpleGrid columns={2} spacing={4} mb={4}>
-                    <Stat>
-                        <Card>
-                            <CardHeader>
-                                <StatLabel>카테고리 총 금액(원화 기준)</StatLabel>
-                            </CardHeader>
-                            <CardBody>
-                                <StatNumber mt={1}> ₩ {formatedLatestTotal} </StatNumber>
-                            </CardBody>
-                        </Card>
-                    </Stat>
-
-                    <Stat>
-                        <Card>
-                            <CardHeader>
-                                <StatLabel>총 수익률</StatLabel>
-                            </CardHeader>
-                            <CardBody>
-                            <Flex alignItems="center" justifyContent="space-between">
-                                <StatNumber color={returnRate >= 0 ? 'red' : 'blue'}>
-                                    <StatArrow type={returnRate >= 0 ? 'increase' : 'decrease'} />
-                                    {(returnRate * 100).toFixed(2)} %
-                                </StatNumber>
-                                <Popover>
-                                    <PopoverTrigger>
-                                        <Button>연도별 수익률 보기</Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent>
-                                        <PopoverArrow />
-                                        <PopoverCloseButton />
-                                        <PopoverHeader>연도별 수익률</PopoverHeader>
-                                        <PopoverBody>
-                                            <Table variant="simple" sx={{
-                                                border: "2px solid gray",
-                                                borderCollapse: "collapse",
-                                                "& th, & td": {
-                                                    border: "1px solid gray",
-                                                }
-                                            }}>
-                                                <Thead bg="gray.400">
-                                                    <Tr>
-                                                        <Th fontSize="lg">년도</Th>
-                                                        <Th fontSize="lg">수익률</Th>
-                                                    </Tr>
-                                                </Thead>
-                                                <Tbody>
-                                                    {annualReturns.map((item, index) => (
-                                                        <Tr key={index}>
-                                                            <Td color="blue.600">{item.year}</Td>
-                                                            <Td color={parseFloat(item.returnRate) >= 0 ? 'blue.600' : 'red.600'}>
-                                                                {item.returnRate}
-                                                            </Td>
+                <Grid
+                    templateColumns={{
+                        base: 'repeat(1, 1fr)',
+                        md: 'repeat(2, 1fr)',
+                    }}
+                    gap={4}
+                    mb={4}
+                >
+                    <GridItem>
+                        <Stat>
+                            <Card>
+                                <CardHeader>
+                                    <StatLabel>카테고리 총 금액(원화 기준)</StatLabel>
+                                </CardHeader>
+                                <CardBody>
+                                    <StatNumber mt={1}> ₩ {formatedLatestTotal} </StatNumber>
+                                </CardBody>
+                            </Card>
+                        </Stat>
+                    </GridItem>
+                    <GridItem>
+                        <Stat>
+                            <Card>
+                                <CardHeader>
+                                    <StatLabel>총 수익률</StatLabel>
+                                </CardHeader>
+                                <CardBody>
+                                <Flex alignItems="center" justifyContent="space-between">
+                                    <StatNumber color={returnRate >= 0 ? 'red' : 'blue'}>
+                                        <StatArrow type={returnRate >= 0 ? 'increase' : 'decrease'} />
+                                        {(returnRate * 100).toFixed(2)} %
+                                    </StatNumber>
+                                    <Popover>
+                                        <PopoverTrigger>
+                                            <Button>연도별 수익률 보기</Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent>
+                                            <PopoverArrow />
+                                            <PopoverCloseButton />
+                                            <PopoverHeader>연도별 수익률</PopoverHeader>
+                                            <PopoverBody>
+                                                <Table variant="simple" sx={{
+                                                    border: "2px solid gray",
+                                                    borderCollapse: "collapse",
+                                                    "& th, & td": {
+                                                        border: "1px solid gray",
+                                                    }
+                                                }}>
+                                                    <Thead bg="gray.400">
+                                                        <Tr>
+                                                            <Th fontSize="lg">년도</Th>
+                                                            <Th fontSize="lg">수익률</Th>
                                                         </Tr>
-                                                    ))}
-                                                </Tbody>
-                                            </Table>
-                                        </PopoverBody>
-                                    </PopoverContent>
-                                </Popover>
-                            </Flex>
-                            </CardBody>
-                        </Card>
-                    </Stat>
-
-
-                </SimpleGrid>
+                                                    </Thead>
+                                                    <Tbody>
+                                                        {annualReturns.map((item, index) => (
+                                                            <Tr key={index}>
+                                                                <Td color="blue.600">{item.year}</Td>
+                                                                <Td color={parseFloat(item.returnRate) >= 0 ? 'blue.600' : 'red.600'}>
+                                                                    {item.returnRate}
+                                                                </Td>
+                                                            </Tr>
+                                                        ))}
+                                                    </Tbody>
+                                                </Table>
+                                            </PopoverBody>
+                                        </PopoverContent>
+                                    </Popover>
+                                </Flex>
+                                </CardBody>
+                            </Card>
+                        </Stat>
+                    </GridItem>
+                </Grid>
             </Box>
            
                 

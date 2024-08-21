@@ -1,8 +1,9 @@
 import { Box, Flex, Grid, GridItem, HStack, Stat, StatArrow, StatGroup, StatHelpText, StatLabel, StatNumber, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr, VStack } from '@chakra-ui/react';
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getCategoryStockCount } from '../api';
+import { ChevronUpIcon, ChevronDownIcon, Icon } from 'lucide-react';
 
 
 interface IcategoryName {
@@ -44,7 +45,17 @@ export default function TotalAssetTable({data} : ITotalAsset) {
     console.log(categoryStockCount)
 
     console.log(result)
-    
+    const [sortColumn, setSortColumn] = useState<'total_asset' | 'yearly_return' | 'percent_on_total'>('total_asset');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+    const handleSort = (column: 'total_asset' | 'yearly_return' | 'percent_on_total') => {
+        if (sortColumn === column) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortColumn(column);
+            setSortDirection('desc');
+        }
+    };
 
     if (result && stockCount) {
         const categoryList = Object.keys(result)
@@ -121,6 +132,7 @@ export default function TotalAssetTable({data} : ITotalAsset) {
         const percent = getPercentOnTotal(result);
         console.log(percent)
 
+
         return(
             <Flex width="100%" flexDirection="column" alignItems="center" mt={10}  >
                 <Box width="95%" overflow="auto" bg="white" boxShadow="lg" borderRadius="xl" maxHeight="700px" mb={10}>
@@ -136,33 +148,87 @@ export default function TotalAssetTable({data} : ITotalAsset) {
                                 <Tr>
                                     <Th fontSize="lg" fontWeight="semibold" color="gray.700" py={3}>카테고리</Th>
                                     <Th fontSize="lg" fontWeight="semibold" color="gray.700" py={3} isNumeric>보유 주식 종류</Th>
-                                    <Th fontSize="lg" fontWeight="semibold" color="gray.700" py={3} isNumeric>총 자산 가치</Th>
-                                    <Th fontSize="lg" fontWeight="semibold" color="gray.700" py={3} isNumeric>올해 수익률</Th>
-                                    <Th fontSize="lg" fontWeight="semibold" color="gray.700" py={3} isNumeric>전체 자산대비 비중</Th>
+                                    <Th
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color="gray.700"
+                                    py={3}
+                                    isNumeric
+                                    onClick={() => handleSort('total_asset')}
+                                    cursor="pointer"
+                                >
+                                    총 자산 가치 {sortColumn === 'total_asset' && (
+                                        <Box as={sortDirection === 'asc' ? ChevronUpIcon : ChevronDownIcon} ml={2} />
+                                    )}
+                                </Th>
+                                <Th
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color="gray.700"
+                                    py={3}
+                                    isNumeric
+                                    onClick={() => handleSort('yearly_return')}
+                                    cursor="pointer"
+                                >
+                                    올해 수익률 {sortColumn === 'yearly_return' && (
+                                        <Box as={sortDirection === 'asc' ? ChevronUpIcon : ChevronDownIcon} ml={2} />
+                                    )}
+                                </Th>
+                                <Th
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color="gray.700"
+                                    py={3}
+                                    isNumeric
+                                    onClick={() => handleSort('percent_on_total')}
+                                    cursor="pointer"
+                                >
+                                    전체 자산대비 비중 {sortColumn === 'percent_on_total' && (
+                                        <Box as={sortDirection === 'asc' ? ChevronUpIcon : ChevronDownIcon} ml={2} />
+                                    )}
+                                </Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {categoryList.map((category, index) => (
-                                    <Tr key={index}>    
-                                        <Td py={3}>
-                                            <Text fontWeight="medium" fontSize="lg">{category}</Text>      
-                                        </Td>
-                                        <Td py={3} isNumeric>
-                                            <Text fontWeight="medium">{stockCount[category]}</Text>
-                                        </Td>
-                                        <Td py={3} isNumeric>
-                                            <Text fontWeight="medium">
-                                                ₩{Number(latestTotalAssets[category]).toLocaleString()}
-                                            </Text>
-                                        </Td>
-                                        <Td py={3} color={yearlyReturns[category] <0 ? 'red.500' : 'blue.500'} fontWeight="bold" isNumeric>
-                                            {yearlyReturns[category]} %
-                                        </Td>
-                                        <Td py={3} isNumeric fontWeight="bold">
-                                            {percent[category]} %
-                                        </Td>
-                                    </Tr>
-                                ))}
+                                {categoryList
+                                    .sort((a, b) => {
+                                        const aValue =
+                                            sortColumn === 'total_asset'
+                                                ? latestTotalAssets[a]
+                                                : sortColumn === 'yearly_return'
+                                                    ? yearlyReturns[a]
+                                                    : percent[a];
+                                        const bValue =
+                                            sortColumn === 'total_asset'
+                                                ? latestTotalAssets[b]
+                                                : sortColumn === 'yearly_return'
+                                                    ? yearlyReturns[b]
+                                                    : percent[b];
+                                        return sortDirection === 'asc'
+                                            ? aValue - bValue
+                                            : bValue - aValue;
+                                    })
+                                    .map((category, index) => (
+                                        <Tr key={index}>
+                                            <Td py={3}>
+                                                <Text fontWeight="medium" fontSize="lg">{category}</Text>
+                                            </Td>
+                                            <Td py={3} isNumeric>
+                                                <Text fontWeight="medium">{stockCount[category]}</Text>
+                                            </Td>
+                                            <Td py={3} isNumeric>
+                                                <Text fontWeight="medium">
+                                                    ₩{Number(latestTotalAssets[category]).toLocaleString()}
+                                                </Text>
+                                            </Td>
+                                            <Td py={3} color={yearlyReturns[category] < 0 ? 'red.500' : 'blue.500'} fontWeight="bold" isNumeric>
+                                                {yearlyReturns[category]} %
+                                            </Td>
+                                            <Td py={3} isNumeric fontWeight="bold">
+                                                {percent[category]} %
+                                            </Td>
+                                        </Tr>
+                                    ))}
                             </Tbody>
                         </Table>
                     </TableContainer>
